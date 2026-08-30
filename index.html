@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Sensex Signal — Dynamic SIP Allocation Engine</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2C4A39">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#ECE7DA; --paper-2:#E3DDCC; --ink:#1E2A24; --ink-soft:#5B6960; --line:#C9BFA3;
+    --liquid:#5E82A6; --liquid-d:#3F5A76;
+    --balance:#A9762F; --balance-d:#7E5A22;
+    --growth:#3F6650; --growth-d:#2C4A39;
+    --card:#F5F2E9;
+    --danger:#9A4B3E;
+    --euphoria:#9A4B3E; --fair:#A9762F; --correction:#4B7A5B; --capitulation:#2C4A39;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;padding:0 0 64px 0;}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 20px;}
+  header.masthead{padding:40px 20px 26px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--paper-2),var(--paper));}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px;}
+  h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(26px,5vw,40px);line-height:1.08;margin:0 0 12px;letter-spacing:-0.01em;}
+  h1 em{font-style:italic;font-weight:400;color:var(--growth-d);}
+  .dek{max-width:60ch;color:var(--ink-soft);font-size:14.5px;line-height:1.55;}
+
+  section{max-width:1000px;margin:28px auto 0;padding:0 20px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:20px;}
+  .section-title{font-family:'Fraunces',serif;font-size:19px;font-weight:600;margin:0 0 4px;}
+  .section-sub{font-size:12.5px;color:var(--ink-soft);margin-bottom:16px;line-height:1.5;}
+
+  /* market data inputs */
+  .mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;}
+  .field label{display:block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px;}
+  .field input,.field select{width:100%;font-family:'IBM Plex Mono',monospace;font-size:14.5px;padding:9px 10px;background:#fff;border:1px solid var(--line);border-radius:3px;color:var(--ink);}
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+  .btn{font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;padding:11px 20px;border:none;border-radius:3px;cursor:pointer;background:var(--growth-d);color:#fff;}
+  .btn.secondary{background:transparent;color:var(--growth-d);border:1px solid var(--growth-d);}
+  .btn:disabled{opacity:.5;cursor:wait;}
+  .status-line{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-soft);margin-top:10px;min-height:16px;}
+  .status-line.err{color:var(--danger);}
+  .status-line.ok{color:var(--growth-d);}
+
+  /* zone dial */
+  .dial-wrap{display:flex;gap:24px;align-items:center;flex-wrap:wrap;}
+  .dial{flex:0 0 220px;}
+  .zone-info{flex:1 1 260px;}
+  .zone-badge{display:inline-block;font-family:'Fraunces',serif;font-weight:600;font-size:22px;padding:6px 16px;border-radius:3px;color:#fff;margin-bottom:10px;}
+  .zone-meta{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft);line-height:1.8;}
+  .zone-meta b{color:var(--ink);}
+  .zone-legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink-soft);}
+  .zone-legend span{display:inline-flex;align-items:center;gap:5px;}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+
+  /* cadence toggle */
+  .toggle-row{display:flex;gap:8px;margin-bottom:16px;}
+  .tab-btn{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.05em;text-transform:uppercase;padding:8px 14px;border:1px solid var(--line);background:var(--paper-2);color:var(--ink-soft);border-radius:3px;cursor:pointer;}
+  .tab-btn.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+
+  /* allocation table */
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  thead th{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;text-align:right;color:var(--ink-soft);padding:9px 10px;border-bottom:1px solid var(--ink);}
+  thead th:first-child{text-align:left;}
+  tbody td{padding:8px 10px;text-align:right;font-family:'IBM Plex Mono',monospace;border-bottom:1px solid var(--line);}
+  tbody td:first-child{text-align:left;font-family:'Inter',sans-serif;font-weight:500;}
+  tbody tr.total td{font-weight:700;border-top:1.5px solid var(--ink);border-bottom:none;}
+  .sleeve-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;}
+
+  /* goal tracker */
+  .stat-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13.5px;}
+  .stat-row:last-child{border-bottom:none;}
+  .stat-row .k{color:var(--ink-soft);}
+  .stat-row .v{font-family:'IBM Plex Mono',monospace;font-weight:600;}
+  .progress-bar{height:10px;background:var(--paper-2);border-radius:5px;overflow:hidden;margin:10px 0 4px;border:1px solid var(--line);}
+  .progress-fill{height:100%;transition:width .5s ease;}
+  .verdict-pill{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.04em;text-transform:uppercase;padding:5px 12px;border-radius:20px;color:#fff;margin-top:8px;}
+
+  /* history */
+  .table-scroll{overflow-x:auto;}
+  .hist-empty{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft);padding:14px 0;}
+  #trendSvg{width:100%;height:120px;margin-top:12px;}
+
+  .notes{font-size:12px;color:var(--ink-soft);line-height:1.6;border-top:1px dashed var(--line);margin-top:16px;padding-top:12px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media (max-width:640px){.grid2{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">Trend Analysis · Dynamic SIP Recommendation Engine</div>
+    <h1>Read the market.<br><em>Reallocate the SIP.</em></h1>
+    <p class="dek">Classifies where the Sensex sits against its own high and valuation, then recomputes your five-sleeve SIP allocation and revalidates whether your ₹1 Cr / 5-year target is still on track.</p>
+  </div>
+</header>
+
+<section>
+  <div class="card">
+    <div class="section-title">1 · Market data</div>
+    <div class="section-sub">Reads the latest figures your GitHub Action fetched (updates daily, weekdays after market close). Enter figures manually if it hasn't run yet.</div>
+    <div class="mgrid">
+      <div class="field"><label for="sensex">Sensex — current</label><input type="number" id="sensex" placeholder="e.g. 77265"></div>
+      <div class="field"><label for="high52w">Sensex — 52-wk / ATH</label><input type="number" id="high52w" placeholder="e.g. 86159"></div>
+      <div class="field"><label for="pe">Nifty 50 P/E ratio</label><input type="number" id="pe" step="0.01" placeholder="e.g. 20.4"></div>
+    </div>
+    <div class="btnrow">
+      <button class="btn" id="fetchBtn">Load latest data.json</button>
+      <button class="btn secondary" id="analyzeBtn">Recalculate from fields above</button>
+    </div>
+    <div class="status-line" id="statusLine"></div>
+  </div>
+</section>
+
+<section>
+  <div class="card">
+    <div class="section-title">2 · Market zone</div>
+    <div class="section-sub">Combines % below high and P/E vs long-run average (~21) into a single regime score.</div>
+    <div class="dial-wrap">
+      <div class="dial"><svg id="dialSvg" viewBox="0 0 220 130"></svg></div>
+      <div class="zone-info">
+        <div class="zone-badge" id="zoneBadge" style="background:var(--ink-soft);">—</div>
+        <div class="zone-meta" id="zoneMeta">Run an analysis to see the current regime.</div>
+        <div class="zone-legend">
+          <span><span class="dot" style="background:var(--euphoria)"></span>Euphoria</span>
+          <span><span class="dot" style="background:var(--fair)"></span>Fair value</span>
+          <span><span class="dot" style="background:var(--correction)"></span>Correction</span>
+          <span><span class="dot" style="background:var(--capitulation)"></span>Capitulation</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="card">
+    <div class="section-title">3 · Recommended SIP allocation</div>
+    <div class="section-sub">Base allocation shifts by zone. Choose the cadence you want to act on.</div>
+    <div class="toggle-row">
+      <button class="tab-btn active" id="cadMonthly" data-cad="monthly">Monthly recheck</button>
+      <button class="tab-btn" id="cadQuarterly" data-cad="quarterly">Quarterly recheck (smoothed)</button>
+    </div>
+    <div class="field" style="max-width:220px;margin-bottom:14px;">
+      <label for="monthlySip">Monthly SIP amount (₹)</label>
+      <input type="number" id="monthlySip" value="100000" step="1000">
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Sleeve</th><th>Base %</th><th>Adjusted %</th><th>Monthly ₹</th></tr></thead>
+        <tbody id="allocBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="card">
+    <div class="section-title">4 · Goal revalidation — ₹1 Cr in 5 years</div>
+    <div class="section-sub">Enter how far along you are. This recomputes the return you now need for the <em>remaining</em> months — not the original plan.</div>
+    <div class="grid2">
+      <div class="field"><label for="targetCorpus">Target corpus (₹)</label><input type="number" id="targetCorpus" value="10000000" step="100000"></div>
+      <div class="field"><label for="targetMonths">Target horizon (months)</label><input type="number" id="targetMonths" value="60"></div>
+      <div class="field"><label for="monthsElapsed">Months elapsed so far</label><input type="number" id="monthsElapsed" value="0"></div>
+      <div class="field"><label for="corpusSoFar">Corpus achieved so far (₹, optional)</label><input type="number" id="corpusSoFar" placeholder="leave blank if just starting"></div>
+    </div>
+    <div class="btnrow"><button class="btn" id="revalidateBtn">Revalidate goal</button></div>
+    <div id="goalOutput" style="margin-top:16px;"></div>
+  </div>
+</section>
+
+<section>
+  <div class="card">
+    <div class="section-title">5 · Snapshot history</div>
+    <div class="section-sub">Every fetch or manual save is stored on this device, so the trend builds up the more you use this.</div>
+    <div id="historyWrap"><div class="hist-empty">No snapshots saved yet.</div></div>
+    <svg id="trendSvg" viewBox="0 0 900 120" preserveAspectRatio="none"></svg>
+  </div>
+</section>
+
+<section>
+  <div class="notes">
+    <b>Read before acting:</b> this tool classifies the market's current position relative to its own recent history — it does not predict future returns. Zone shifts should change where fresh SIP money goes, never trigger selling existing units (that creates avoidable LTCG/STCG tax drag, as discussed earlier). The ₹1 Cr target implies an XIRR near 18.8% annualised from a standing start; that requirement only gets steeper if early months underperform, which is exactly what the revalidation panel above is for. Treat every output here as a planning input, not a guarantee — small/mid-cap-heavy portfolios carry real drawdown risk that no allocation formula removes.
+  </div>
+</section>
+
+<script>
+/* ---------------- storage helpers (localStorage — persists per-device) ---------------- */
+async function loadState(){
+  try{
+    const v = localStorage.getItem('app-state');
+    return v ? JSON.parse(v) : null;
+  }catch(e){ return null; }
+}
+async function saveState(state){
+  try{ localStorage.setItem('app-state', JSON.stringify(state)); }catch(e){ console.error('save state failed', e); }
+}
+async function loadSnapshots(){
+  try{
+    const v = localStorage.getItem('market-snapshots');
+    return v ? JSON.parse(v) : [];
+  }catch(e){ return []; }
+}
+async function saveSnapshots(list){
+  try{ localStorage.setItem('market-snapshots', JSON.stringify(list.slice(-30))); }catch(e){ console.error('save snapshots failed', e); }
+}
+
+/* ---------------- formatting ---------------- */
+function fmtINR(n){
+  if(n===null||n===undefined||isNaN(n)) return '—';
+  n = Math.round(n);
+  const neg = n<0; n=Math.abs(n);
+  if(n>=1e7) return (neg?'-':'')+'₹'+(n/1e7).toFixed(2)+' Cr';
+  if(n>=1e5) return (neg?'-':'')+'₹'+(n/1e5).toFixed(2)+' L';
+  const s=n.toString().split('').reverse().join('');
+  let out=s.slice(0,3);
+  for(let i=3;i<s.length;i+=2) out+=','+s.slice(i,i+2);
+  return (neg?'-':'')+'₹'+out.split('').reverse().join('');
+}
+
+/* ---------------- zone scoring ---------------- */
+function scoreZone(pctBelowHigh, pe){
+  let priceScore;
+  if(pctBelowHigh < 5) priceScore = -2;
+  else if(pctBelowHigh < 15) priceScore = 0;
+  else if(pctBelowHigh < 25) priceScore = 1;
+  else priceScore = 2;
+
+  let peScore;
+  if(pe > 25) peScore = -2;
+  else if(pe > 23) peScore = -1;
+  else if(pe >= 18) peScore = 0;
+  else if(pe >= 15) peScore = 1;
+  else peScore = 2;
+
+  const combined = (priceScore + peScore) / 2;
+  let zone, color;
+  if(combined <= -1.5){ zone='Euphoria'; color='var(--euphoria)'; }
+  else if(combined <= 0.5){ zone='Fair Value'; color='var(--fair)'; }
+  else if(combined <= 1.5){ zone='Correction'; color='var(--correction)'; }
+  else { zone='Capitulation'; color='var(--capitulation)'; }
+  return {zone, color, combined, priceScore, peScore};
+}
+
+const ZONE_DELTA = {
+  'Euphoria':     {small:-10, mid:0,  liquid:10},
+  'Fair Value':   {small:0,   mid:0,  liquid:0},
+  'Correction':   {small:3,   mid:2,  liquid:-5},
+  'Capitulation': {small:6,   mid:4,  liquid:-10},
+};
+const BASE_ALLOC = {small:30, mid:25, flexi:25, thematic:10, liquid:10};
+const SLEEVE_META = [
+  {key:'small', label:'Small cap', color:'#9A4B3E'},
+  {key:'mid', label:'Mid cap', color:'#A9762F'},
+  {key:'flexi', label:'Aggressive flexi cap', color:'#4B7A5B'},
+  {key:'thematic', label:'Sectoral / thematic', color:'#5E82A6'},
+  {key:'liquid', label:'Liquid / dry powder', color:'#8A8272'},
+];
+
+let lastZoneResult = null;
+let cadence = 'monthly';
+
+/* ---------------- dial rendering ---------------- */
+function renderDial(combined){
+  // combined ranges roughly -2 to 2, map to angle -90 to 90 deg across a semicircle
+  const svg = document.getElementById('dialSvg');
+  const clamped = Math.max(-2, Math.min(2, combined));
+  const angle = (clamped/2) * 90; // -90..90
+  const rad = (angle-90) * Math.PI/180;
+  const cx=110, cy=115, r=95;
+  const nx = cx + r*Math.cos(rad);
+  const ny = cy + r*Math.sin(rad);
+  svg.innerHTML = `
+    <path d="M 15 115 A 95 95 0 0 1 205 115" fill="none" stroke="var(--euphoria)" stroke-width="14" stroke-dasharray="149.2 447.7" />
+    <path d="M 15 115 A 95 95 0 0 1 205 115" fill="none" stroke="var(--fair)" stroke-width="14" stroke-dasharray="149.2 149.2 149.2" stroke-dashoffset="-149.2" />
+    <path d="M 15 115 A 95 95 0 0 1 205 115" fill="none" stroke="var(--correction)" stroke-width="14" stroke-dasharray="74.6 448" stroke-dashoffset="-298.4" />
+    <path d="M 15 115 A 95 95 0 0 1 205 115" fill="none" stroke="var(--capitulation)" stroke-width="14" stroke-dasharray="74.6 448" stroke-dashoffset="-373" />
+    <line x1="${cx}" y1="${cy}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="#1E2A24" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="${cx}" cy="${cy}" r="6" fill="#1E2A24"/>
+  `;
+}
+
+/* ---------------- main analysis ---------------- */
+function runAnalysis(sensex, high52w, pe){
+  const pctBelowHigh = ((high52w - sensex)/high52w)*100;
+  const result = scoreZone(pctBelowHigh, pe);
+  lastZoneResult = {...result, pctBelowHigh, sensex, high52w, pe};
+  renderDial(result.combined);
+
+  const badge = document.getElementById('zoneBadge');
+  badge.textContent = result.zone;
+  badge.style.background = result.color;
+
+  document.getElementById('zoneMeta').innerHTML = `
+    Sensex is <b>${pctBelowHigh.toFixed(1)}%</b> below its reference high (${fmtINR(high52w).replace('₹','')} vs current ${fmtINR(sensex).replace('₹','')}).<br>
+    Nifty P/E is <b>${pe.toFixed(2)}</b> against a long-run average near 21.<br>
+    Regime score: <b>${result.combined.toFixed(2)}</b> (−2 euphoric … +2 capitulation)
+  `;
+  renderAllocation();
+}
+
+function renderAllocation(){
+  const tbody = document.getElementById('allocBody');
+  const monthlySip = parseFloat(document.getElementById('monthlySip').value) || 0;
+  if(!lastZoneResult){ tbody.innerHTML=''; return; }
+  const delta = ZONE_DELTA[lastZoneResult.zone];
+  let adjusted = {};
+  SLEEVE_META.forEach(s => adjusted[s.key] = BASE_ALLOC[s.key] + (delta[s.key]||0));
+  // quarterly cadence: dampen the shift by 50% to avoid over-trading on a smoothed signal
+  if(cadence==='quarterly'){
+    SLEEVE_META.forEach(s => {
+      const base = BASE_ALLOC[s.key];
+      adjusted[s.key] = base + (adjusted[s.key]-base)*0.5;
+    });
+  }
+  let rows = '';
+  let totalPct = 0, totalAmt = 0;
+  SLEEVE_META.forEach(s => {
+    const pct = adjusted[s.key];
+    const amt = monthlySip * pct/100;
+    totalPct += pct; totalAmt += amt;
+    rows += `<tr><td><span class="sleeve-dot" style="background:${s.color}"></span>${s.label}</td><td>${BASE_ALLOC[s.key]}%</td><td>${pct.toFixed(1)}%</td><td>${fmtINR(amt)}</td></tr>`;
+  });
+  rows += `<tr class="total"><td>Total</td><td>100%</td><td>${totalPct.toFixed(1)}%</td><td>${fmtINR(totalAmt)}</td></tr>`;
+  tbody.innerHTML = rows;
+}
+
+/* ---------------- live fetch from GitHub Actions-generated data.json ---------------- */
+async function fetchLiveData(){
+  const btn = document.getElementById('fetchBtn');
+  const status = document.getElementById('statusLine');
+  btn.disabled = true;
+  status.className = 'status-line';
+  status.textContent = 'Reading latest data.json…';
+  try{
+    const response = await fetch('./data.json?t=' + Date.now(), {cache:'no-store'});
+    if(!response.ok) throw new Error('data.json not reachable (HTTP ' + response.status + ')');
+    const parsed = await response.json();
+    if(!parsed.sensex || !parsed.high52w || !parsed.pe) throw new Error('data.json missing required fields');
+
+    document.getElementById('sensex').value = parsed.sensex;
+    document.getElementById('high52w').value = parsed.high52w;
+    document.getElementById('pe').value = parsed.pe;
+
+    const warnings = [];
+    if(parsed.sensexFetchOk === false) warnings.push('Sensex figure is stale (last successful fetch)');
+    if(parsed.peFetchOk === false) warnings.push('P/E figure is stale (last successful fetch)');
+
+    status.className = warnings.length ? 'status-line err' : 'status-line ok';
+    status.textContent = `As of ${parsed.asOf || 'unknown date'}.` + (warnings.length ? ' ⚠ ' + warnings.join('; ') + '.' : ' Saved as a new snapshot.');
+
+    runAnalysis(parsed.sensex, parsed.high52w, parsed.pe);
+    await addSnapshot(parsed.sensex, parsed.high52w, parsed.pe, lastZoneResult.zone);
+    await renderHistory();
+  }catch(e){
+    status.className = 'status-line err';
+    status.textContent = 'Could not read data.json — enter figures manually above and click "Recalculate". (' + e.message + ')';
+    console.error(e);
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+async function addSnapshot(sensex, high52w, pe, zone){
+  const snapshots = await loadSnapshots();
+  snapshots.push({date: new Date().toISOString(), sensex, high52w, pe, zone});
+  await saveSnapshots(snapshots);
+}
+
+/* ---------------- history rendering ---------------- */
+async function renderHistory(){
+  const snapshots = await loadSnapshots();
+  const wrap = document.getElementById('historyWrap');
+  if(snapshots.length===0){
+    wrap.innerHTML = '<div class="hist-empty">No snapshots saved yet.</div>';
+    document.getElementById('trendSvg').innerHTML = '';
+    return;
+  }
+  const recent = snapshots.slice(-12).reverse();
+  let rows = recent.map(s => {
+    const d = new Date(s.date);
+    return `<tr><td>${d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</td><td>${s.sensex.toLocaleString('en-IN')}</td><td>${s.pe.toFixed(2)}</td><td>${s.zone}</td></tr>`;
+  }).join('');
+  wrap.innerHTML = `<div class="table-scroll"><table><thead><tr><th style="text-align:left">Date</th><th>Sensex</th><th>P/E</th><th>Zone</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+
+  // trend line
+  const svg = document.getElementById('trendSvg');
+  const data = snapshots.slice(-24);
+  if(data.length < 2){ svg.innerHTML=''; return; }
+  const W=900,H=120,padL=50,padR=10,padT=10,padB=10;
+  const vals = data.map(d=>d.sensex);
+  const min = Math.min(...vals), max = Math.max(...vals);
+  const x = i => padL + (i/(data.length-1))*(W-padL-padR);
+  const y = v => padT + (H-padT-padB) - ((v-min)/((max-min)||1))*(H-padT-padB);
+  const path = data.map((d,i)=> (i===0?'M':'L')+x(i).toFixed(1)+','+y(d.sensex).toFixed(1)).join(' ');
+  svg.innerHTML = `
+    <text x="4" y="${y(max)+4}" font-family="IBM Plex Mono" font-size="9" fill="#5B6960">${Math.round(max).toLocaleString('en-IN')}</text>
+    <text x="4" y="${y(min)+4}" font-family="IBM Plex Mono" font-size="9" fill="#5B6960">${Math.round(min).toLocaleString('en-IN')}</text>
+    <path d="${path}" fill="none" stroke="#2C4A39" stroke-width="2"/>
+  `;
+}
+
+/* ---------------- goal revalidation ---------------- */
+function solveRate(fn, lo, hi, iters){
+  for(let i=0;i<iters;i++){
+    const mid = (lo+hi)/2;
+    if(fn(mid) > 0) hi = mid; else lo = mid;
+  }
+  return (lo+hi)/2;
+}
+function fvCombined(corpusSoFar, monthlySip, months, annualRate){
+  const i = annualRate/12;
+  const fvLump = corpusSoFar * Math.pow(1+i, months);
+  const fvAnnuity = i===0 ? monthlySip*months : monthlySip * (((Math.pow(1+i,months)-1)/i)) * (1+i);
+  return fvLump + fvAnnuity;
+}
+
+async function revalidateGoal(){
+  const target = parseFloat(document.getElementById('targetCorpus').value)||10000000;
+  const targetMonths = parseInt(document.getElementById('targetMonths').value)||60;
+  const monthsElapsed = Math.max(0, parseInt(document.getElementById('monthsElapsed').value)||0);
+  const corpusSoFarRaw = document.getElementById('corpusSoFar').value;
+  const monthlySip = parseFloat(document.getElementById('monthlySip').value)||100000;
+  const remainingMonths = Math.max(1, targetMonths - monthsElapsed);
+
+  const out = document.getElementById('goalOutput');
+
+  // baseline required XIRR from scratch (original plan)
+  const baselineRate = solveRate(r => fvCombined(0, monthlySip, targetMonths, r) - target, 0.001, 0.6, 60);
+
+  let html = `<div class="stat-row"><span class="k">Required XIRR — original full-horizon plan</span><span class="v">${(baselineRate*100).toFixed(2)}%</span></div>`;
+
+  if(corpusSoFarRaw !== '' && monthsElapsed > 0){
+    const corpusSoFar = parseFloat(corpusSoFarRaw)||0;
+    const benchmarkCorpus = fvCombined(0, monthlySip, monthsElapsed, baselineRate);
+    const requiredForwardRate = solveRate(r => fvCombined(corpusSoFar, monthlySip, remainingMonths, r) - target, -0.5, 0.9, 80);
+    const diffPct = ((corpusSoFar - benchmarkCorpus)/benchmarkCorpus)*100;
+
+    let verdict, verdictColor;
+    if(diffPct > 3){ verdict='Ahead of plan'; verdictColor='var(--growth-d)'; }
+    else if(diffPct >= -3){ verdict='On track'; verdictColor='var(--balance-d)'; }
+    else { verdict='Behind plan'; verdictColor='var(--danger)'; }
+
+    const progressPct = Math.max(0, Math.min(100, (corpusSoFar/target)*100));
+
+    html += `
+      <div class="stat-row"><span class="k">Expected corpus at month ${monthsElapsed} (on original plan)</span><span class="v">${fmtINR(benchmarkCorpus)}</span></div>
+      <div class="stat-row"><span class="k">Actual corpus achieved</span><span class="v">${fmtINR(corpusSoFar)}</span></div>
+      <div class="stat-row"><span class="k">Variance vs plan</span><span class="v">${diffPct>=0?'+':''}${diffPct.toFixed(1)}%</span></div>
+      <div class="stat-row"><span class="k">Required XIRR — for remaining ${remainingMonths} months</span><span class="v">${isFinite(requiredForwardRate)?(requiredForwardRate*100).toFixed(2)+'%':'Target likely unreachable at any reasonable rate'}</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${progressPct}%;background:${verdictColor}"></div></div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);">${progressPct.toFixed(1)}% of target corpus reached</div>
+      <div class="verdict-pill" style="background:${verdictColor}">${verdict}</div>
+    `;
+  } else {
+    html += `<div class="section-sub" style="margin-top:10px;">Enter months elapsed and corpus achieved so far to see whether you're ahead of, on, or behind the required trajectory.</div>`;
+  }
+  out.innerHTML = html;
+  await saveState({monthlySip, targetCorpus: target, targetMonths, monthsElapsed, corpusSoFar: corpusSoFarRaw, cadence});
+}
+
+/* ---------------- wiring ---------------- */
+document.getElementById('fetchBtn').addEventListener('click', fetchLiveData);
+document.getElementById('analyzeBtn').addEventListener('click', () => {
+  const sensex = parseFloat(document.getElementById('sensex').value);
+  const high52w = parseFloat(document.getElementById('high52w').value);
+  const pe = parseFloat(document.getElementById('pe').value);
+  if(!sensex || !high52w || !pe){
+    document.getElementById('statusLine').className='status-line err';
+    document.getElementById('statusLine').textContent = 'Fill in all three fields before recalculating.';
+    return;
+  }
+  document.getElementById('statusLine').className='status-line ok';
+  document.getElementById('statusLine').textContent = 'Recalculated from manually entered figures.';
+  runAnalysis(sensex, high52w, pe);
+  addSnapshot(sensex, high52w, pe, lastZoneResult.zone).then(renderHistory);
+});
+document.getElementById('monthlySip').addEventListener('input', renderAllocation);
+document.getElementById('cadMonthly').addEventListener('click', ()=>{ cadence='monthly'; document.getElementById('cadMonthly').classList.add('active'); document.getElementById('cadQuarterly').classList.remove('active'); renderAllocation(); });
+document.getElementById('cadQuarterly').addEventListener('click', ()=>{ cadence='quarterly'; document.getElementById('cadQuarterly').classList.add('active'); document.getElementById('cadMonthly').classList.remove('active'); renderAllocation(); });
+document.getElementById('revalidateBtn').addEventListener('click', revalidateGoal);
+
+/* ---------------- PWA service worker registration ---------------- */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(e => console.error('SW registration failed', e));
+  });
+}
+
+/* ---------------- init ---------------- */
+(async function init(){
+  renderDial(0);
+  const state = await loadState();
+  if(state){
+    if(state.monthlySip) document.getElementById('monthlySip').value = state.monthlySip;
+    if(state.targetCorpus) document.getElementById('targetCorpus').value = state.targetCorpus;
+    if(state.targetMonths) document.getElementById('targetMonths').value = state.targetMonths;
+    if(state.monthsElapsed) document.getElementById('monthsElapsed').value = state.monthsElapsed;
+    if(state.corpusSoFar) document.getElementById('corpusSoFar').value = state.corpusSoFar;
+  }
+  await renderHistory();
+  const snapshots = await loadSnapshots();
+  if(snapshots.length){
+    const last = snapshots[snapshots.length-1];
+    document.getElementById('sensex').value = last.sensex;
+    document.getElementById('high52w').value = last.high52w;
+    document.getElementById('pe').value = last.pe;
+    runAnalysis(last.sensex, last.high52w, last.pe);
+  }
+})();
+</script>
+</body>
+</html>
