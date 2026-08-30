@@ -36,7 +36,14 @@
 
   /* market data inputs */
   .mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;}
-  .field label{display:block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px;}
+  .field label{display:flex;align-items:center;gap:5px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px;}
+  .info-dot{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:14px;height:14px;border-radius:50%;
+    background:var(--line);color:var(--ink);
+    font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;
+    cursor:help;flex:0 0 auto;
+  }
   .field input,.field select{width:100%;font-family:'IBM Plex Mono',monospace;font-size:14.5px;padding:9px 10px;background:#fff;border:1px solid var(--line);border-radius:3px;color:var(--ink);}
   .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
   .btn{font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;padding:11px 20px;border:none;border-radius:3px;cursor:pointer;background:var(--growth-d);color:#fff;}
@@ -105,9 +112,9 @@
     <div class="section-title">1 · Market data</div>
     <div class="section-sub">Reads the latest figures your GitHub Action fetched (updates daily, weekdays after market close). Enter figures manually if it hasn't run yet.</div>
     <div class="mgrid">
-      <div class="field"><label for="sensex">Sensex — current</label><input type="number" id="sensex" placeholder="e.g. 77265"></div>
-      <div class="field"><label for="high52w">Sensex — 52-wk / ATH</label><input type="number" id="high52w" placeholder="e.g. 86159"></div>
-      <div class="field"><label for="pe">Nifty 50 P/E ratio</label><input type="number" id="pe" step="0.01" placeholder="e.g. 20.4"></div>
+      <div class="field"><label for="sensex">Sensex — current<span class="info-dot" title="Today's BSE Sensex closing or live level. This is the reference point the zone score measures against its high.">i</span></label><input type="number" id="sensex" placeholder="e.g. 77265" title="Today's BSE Sensex closing or live level."></div>
+      <div class="field"><label for="high52w">Sensex — 52-wk / ATH<span class="info-dot" title="The highest Sensex close in the last 52 weeks (or all-time high, if you prefer that as the reference). Used to calculate how far the market has pulled back.">i</span></label><input type="number" id="high52w" placeholder="e.g. 86159" title="Highest Sensex close in the last 52 weeks, used to measure the current pullback."></div>
+      <div class="field"><label for="pe">Nifty 50 P/E ratio<span class="info-dot" title="Current Nifty 50 price-to-earnings ratio. Long-run average is roughly 21 — above that suggests expensive valuations, below suggests cheap.">i</span></label><input type="number" id="pe" step="0.01" placeholder="e.g. 20.4" title="Current Nifty 50 P/E ratio (long-run average ~21)."></div>
     </div>
     <div class="btnrow">
       <button class="btn" id="fetchBtn">Load latest data.json</button>
@@ -146,8 +153,8 @@
       <button class="tab-btn" id="cadQuarterly" data-cad="quarterly">Quarterly recheck (smoothed)</button>
     </div>
     <div class="field" style="max-width:220px;margin-bottom:14px;">
-      <label for="monthlySip">Monthly SIP amount (₹)</label>
-      <input type="number" id="monthlySip" value="100000" step="1000">
+      <label for="monthlySip">Monthly SIP amount (₹)<span class="info-dot" title="Your total monthly SIP outlay across all sleeves. The recommended allocation table splits this amount across the five sleeves based on the current zone.">i</span></label>
+      <input type="number" id="monthlySip" value="100000" step="1000" title="Total monthly SIP amount to be split across the five sleeves.">
     </div>
     <div class="table-scroll">
       <table>
@@ -163,10 +170,10 @@
     <div class="section-title">4 · Goal revalidation — ₹1 Cr in 5 years</div>
     <div class="section-sub">Enter how far along you are. This recomputes the return you now need for the <em>remaining</em> months — not the original plan.</div>
     <div class="grid2">
-      <div class="field"><label for="targetCorpus">Target corpus (₹)</label><input type="number" id="targetCorpus" value="10000000" step="100000"></div>
-      <div class="field"><label for="targetMonths">Target horizon (months)</label><input type="number" id="targetMonths" value="60"></div>
-      <div class="field"><label for="monthsElapsed">Months elapsed so far</label><input type="number" id="monthsElapsed" value="0"></div>
-      <div class="field"><label for="corpusSoFar">Corpus achieved so far (₹, optional)</label><input type="number" id="corpusSoFar" placeholder="leave blank if just starting"></div>
+      <div class="field"><label for="targetCorpus">Target corpus (₹)<span class="info-dot" title="The final corpus you're aiming for at the end of the horizon — e.g. ₹1,00,00,000 for a ₹1 Cr goal.">i</span></label><input type="number" id="targetCorpus" value="10000000" step="100000" title="Final corpus you're aiming for at the end of the horizon."></div>
+      <div class="field"><label for="targetMonths">Target horizon (months)<span class="info-dot" title="Total number of months you're investing for — e.g. 60 for a 5-year plan.">i</span></label><input type="number" id="targetMonths" value="60" title="Total months you're investing for (e.g. 60 = 5 years)."></div>
+      <div class="field"><label for="monthsElapsed">Months elapsed so far<span class="info-dot" title="How many months into the plan you already are. Used to compare your actual corpus against where the original plan expected you to be by now.">i</span></label><input type="number" id="monthsElapsed" value="0" title="How many months into the plan you already are."></div>
+      <div class="field"><label for="corpusSoFar">Corpus achieved so far (₹, optional)<span class="info-dot" title="Your actual current corpus value, if you've already started investing. Leave blank if you're just starting out — the tool will only show the baseline required return.">i</span></label><input type="number" id="corpusSoFar" placeholder="leave blank if just starting" title="Your actual current corpus value, if already investing. Leave blank if just starting."></div>
     </div>
     <div class="btnrow"><button class="btn" id="revalidateBtn">Revalidate goal</button></div>
     <div id="goalOutput" style="margin-top:16px;"></div>
