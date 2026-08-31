@@ -103,71 +103,13 @@
   <div class="wrap">
     <div class="eyebrow">Trend Analysis · Dynamic SIP Recommendation Engine</div>
     <h1>Read the market.<br><em>Reallocate the SIP.</em></h1>
-    <p class="dek">Classifies where the Sensex sits against its own high and valuation, then recomputes your five-sleeve SIP allocation and revalidates whether your ₹1 Cr / 5-year target is still on track.</p>
+    <p class="dek">Classifies where the Sensex sits against its own high and valuation, then recomputes your five-sleeve SIP allocation and revalidates whether your goal is still on track.</p>
   </div>
 </header>
 
 <section>
   <div class="card">
-    <div class="section-title">1 · Market data</div>
-    <div class="section-sub">Reads the latest figures your GitHub Action fetched (updates daily, weekdays after market close). Enter figures manually if it hasn't run yet.</div>
-    <div class="mgrid">
-      <div class="field"><label for="sensex">Sensex — current<span class="info-dot" title="Today's BSE Sensex closing or live level. This is the reference point the zone score measures against its high.">i</span></label><input type="number" id="sensex" placeholder="e.g. 77265" title="Today's BSE Sensex closing or live level."></div>
-      <div class="field"><label for="high52w">Sensex — 52-wk / ATH<span class="info-dot" title="The highest Sensex close in the last 52 weeks (or all-time high, if you prefer that as the reference). Used to calculate how far the market has pulled back.">i</span></label><input type="number" id="high52w" placeholder="e.g. 86159" title="Highest Sensex close in the last 52 weeks, used to measure the current pullback."></div>
-      <div class="field"><label for="pe">Nifty 50 P/E ratio<span class="info-dot" title="Current Nifty 50 price-to-earnings ratio. Long-run average is roughly 21 — above that suggests expensive valuations, below suggests cheap.">i</span></label><input type="number" id="pe" step="0.01" placeholder="e.g. 20.4" title="Current Nifty 50 P/E ratio (long-run average ~21)."></div>
-    </div>
-    <div class="btnrow">
-      <button class="btn" id="fetchBtn">Load latest data.json</button>
-      <button class="btn secondary" id="analyzeBtn">Recalculate from fields above</button>
-    </div>
-    <div class="status-line" id="statusLine"></div>
-  </div>
-</section>
-
-<section>
-  <div class="card">
-    <div class="section-title">2 · Market zone</div>
-    <div class="section-sub">Combines % below high and P/E vs long-run average (~21) into a single regime score.</div>
-    <div class="dial-wrap">
-      <div class="dial"><svg id="dialSvg" viewBox="0 0 220 130"></svg></div>
-      <div class="zone-info">
-        <div class="zone-badge" id="zoneBadge" style="background:var(--ink-soft);">—</div>
-        <div class="zone-meta" id="zoneMeta">Run an analysis to see the current regime.</div>
-        <div class="zone-legend">
-          <span><span class="dot" style="background:var(--euphoria)"></span>Euphoria</span>
-          <span><span class="dot" style="background:var(--fair)"></span>Fair value</span>
-          <span><span class="dot" style="background:var(--correction)"></span>Correction</span>
-          <span><span class="dot" style="background:var(--capitulation)"></span>Capitulation</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="card">
-    <div class="section-title">3 · Recommended SIP allocation</div>
-    <div class="section-sub">Base allocation shifts by zone. Choose the cadence you want to act on.</div>
-    <div class="toggle-row">
-      <button class="tab-btn active" id="cadMonthly" data-cad="monthly">Monthly recheck</button>
-      <button class="tab-btn" id="cadQuarterly" data-cad="quarterly">Quarterly recheck (smoothed)</button>
-    </div>
-    <div class="field" style="max-width:220px;margin-bottom:14px;">
-      <label for="monthlySip">Monthly SIP amount (₹)<span class="info-dot" title="Your total monthly SIP outlay across all sleeves. The recommended allocation table splits this amount across the five sleeves based on the current zone.">i</span></label>
-      <input type="number" id="monthlySip" value="100000" step="1000" title="Total monthly SIP amount to be split across the five sleeves.">
-    </div>
-    <div class="table-scroll">
-      <table>
-        <thead><tr><th>Sleeve</th><th>Base %</th><th>Adjusted %</th><th>Monthly ₹</th></tr></thead>
-        <tbody id="allocBody"></tbody>
-      </table>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="card">
-    <div class="section-title">4 · Your goal</div>
+    <div class="section-title">1 · Your goal</div>
     <div class="section-sub">What are you actually saving for? Set the goal, its cost today, and how inflation and time change what you'll really need.</div>
 
     <div class="mgrid" style="margin-bottom:14px;">
@@ -208,7 +150,91 @@
       <div class="stat-row"><span class="k">Inflation-adjusted target, in <span id="goalYearsEcho">5</span> years</span><span class="v" id="goalFutureVal" style="font-size:16px;">—</span></div>
     </div>
 
-    <div class="section-title" style="margin-top:22px;">5 · Goal revalidation</div>
+    
+  </div>
+</section>
+
+<section>
+  <div class="card">
+    <div class="section-title">2 · SIP calculator</div>
+    <div class="section-sub">Computes the monthly SIP needed to reach your goal above, using an assumed annual return. The result pre-fills the field below, which you can still edit by hand.</div>
+    <div class="mgrid">
+      <div class="field">
+        <label for="assumedReturn">Assumed annual return, for this calculation only (%)<span class="info-dot" title="A single blended-return assumption used only to size the required SIP. It does not change the actual sleeve allocation below, which reacts to the market zone instead.">i</span></label>
+        <input type="number" id="assumedReturn" value="12" step="0.5" title="Expected annual return used only to size the required SIP.">
+      </div>
+      <div class="field">
+        <label>Required monthly SIP<span class="info-dot" title="The monthly SIP that would reach your inflation-adjusted goal at the assumed return above, over the years set in your goal.">i</span></label>
+        <input type="text" id="calculatedSip" readonly title="Monthly SIP required to hit your goal at the assumed return.">
+      </div>
+    </div>
+    <div class="btnrow"><button class="btn" id="calcSipBtn">Calculate required SIP</button></div>
+
+    <div class="field" style="max-width:260px;margin-top:18px;">
+      <label for="monthlySip">Monthly SIP you'll actually invest (₹)<span class="info-dot" title="This is the number that actually drives the allocation table and the goal revalidation below. It starts as the calculated value above, but you can override it — e.g. to test what happens if you invest less (or more) than required.">i</span></label>
+      <input type="number" id="monthlySip" value="100000" step="1000" title="The SIP amount actually used everywhere below — editable.">
+    </div>
+    <div class="status-line" id="sipCalcStatus"></div>
+  </div>
+</section>
+
+<section>
+  <div class="card">
+    <div class="section-title">3 · Market data</div>
+    <div class="section-sub">Reads the latest figures your GitHub Action fetched (updates daily, weekdays after market close). Enter figures manually if it hasn't run yet.</div>
+    <div class="mgrid">
+      <div class="field"><label for="sensex">Sensex — current<span class="info-dot" title="Today's BSE Sensex closing or live level. This is the reference point the zone score measures against its high.">i</span></label><input type="number" id="sensex" placeholder="e.g. 77265" title="Today's BSE Sensex closing or live level."></div>
+      <div class="field"><label for="high52w">Sensex — 52-wk / ATH<span class="info-dot" title="The highest Sensex close in the last 52 weeks (or all-time high, if you prefer that as the reference). Used to calculate how far the market has pulled back.">i</span></label><input type="number" id="high52w" placeholder="e.g. 86159" title="Highest Sensex close in the last 52 weeks, used to measure the current pullback."></div>
+      <div class="field"><label for="pe">Nifty 50 P/E ratio<span class="info-dot" title="Current Nifty 50 price-to-earnings ratio. Long-run average is roughly 21 — above that suggests expensive valuations, below suggests cheap.">i</span></label><input type="number" id="pe" step="0.01" placeholder="e.g. 20.4" title="Current Nifty 50 P/E ratio (long-run average ~21)."></div>
+    </div>
+    <div class="btnrow">
+      <button class="btn" id="fetchBtn">Load latest data.json</button>
+      <button class="btn secondary" id="analyzeBtn">Recalculate from fields above</button>
+    </div>
+    <div class="status-line" id="statusLine"></div>
+  </div>
+</section>
+
+<section>
+  <div class="card">
+    <div class="section-title">4 · Market zone</div>
+    <div class="section-sub">Combines % below high and P/E vs long-run average (~21) into a single regime score.</div>
+    <div class="dial-wrap">
+      <div class="dial"><svg id="dialSvg" viewBox="0 0 220 130"></svg></div>
+      <div class="zone-info">
+        <div class="zone-badge" id="zoneBadge" style="background:var(--ink-soft);">—</div>
+        <div class="zone-meta" id="zoneMeta">Run an analysis to see the current regime.</div>
+        <div class="zone-legend">
+          <span><span class="dot" style="background:var(--euphoria)"></span>Euphoria</span>
+          <span><span class="dot" style="background:var(--fair)"></span>Fair value</span>
+          <span><span class="dot" style="background:var(--correction)"></span>Correction</span>
+          <span><span class="dot" style="background:var(--capitulation)"></span>Capitulation</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="card">
+    <div class="section-title">5 · Recommended SIP allocation</div>
+    <div class="section-sub">Base allocation shifts by zone. Uses the monthly SIP amount from the calculator above. Choose the cadence you want to act on.</div>
+    <div class="toggle-row">
+      <button class="tab-btn active" id="cadMonthly" data-cad="monthly">Monthly recheck</button>
+      <button class="tab-btn" id="cadQuarterly" data-cad="quarterly">Quarterly recheck (smoothed)</button>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Sleeve</th><th>Base %</th><th>Adjusted %</th><th>Monthly ₹</th></tr></thead>
+        <tbody id="allocBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="card">
+    <div class="section-title">6 · Goal revalidation</div>
     <div class="section-sub">Enter how far along you are. This recomputes the return you now need for the <em>remaining</em> months against the inflation-adjusted target above — not the original plan.</div>
     <div class="grid2">
       <div class="field"><label for="monthsElapsed">Months elapsed so far<span class="info-dot" title="How many months into the plan you already are. Used to compare your actual corpus against where the original plan expected you to be by now.">i</span></label><input type="number" id="monthsElapsed" value="0" title="How many months into the plan you already are."></div>
@@ -221,7 +247,7 @@
 
 <section>
   <div class="card">
-    <div class="section-title">6 · Snapshot history</div>
+    <div class="section-title">7 · Snapshot history</div>
     <div class="section-sub">Every fetch or manual save is stored on this device, so the trend builds up the more you use this.</div>
     <div id="historyWrap"><div class="hist-empty">No snapshots saved yet.</div></div>
     <svg id="trendSvg" viewBox="0 0 900 120" preserveAspectRatio="none"></svg>
@@ -230,7 +256,7 @@
 
 <section>
   <div class="notes">
-    <b>Read before acting:</b> this tool classifies the market's current position relative to its own recent history — it does not predict future returns. Zone shifts should change where fresh SIP money goes, never trigger selling existing units (that creates avoidable LTCG/STCG tax drag, as discussed earlier). The ₹1 Cr target implies an XIRR near 18.8% annualised from a standing start; that requirement only gets steeper if early months underperform, which is exactly what the revalidation panel above is for. Treat every output here as a planning input, not a guarantee — small/mid-cap-heavy portfolios carry real drawdown risk that no allocation formula removes.
+    <b>Read before acting:</b> this tool classifies the market's current position relative to its own recent history — it does not predict future returns. Zone shifts should change where fresh SIP money goes, never trigger selling existing units (that creates avoidable LTCG/STCG tax drag, as discussed earlier). The required XIRR shown above is only as reliable as the assumed return you set in the SIP calculator, and it gets steeper if early months underperform — which is exactly what the revalidation panel is for. Treat every output here as a planning input, not a guarantee — small/mid-cap-heavy portfolios carry real drawdown risk that no allocation formula removes.
   </div>
 </section>
 
@@ -454,6 +480,32 @@ document.getElementById('goalType').addEventListener('change', (e) => {
   document.getElementById(id).addEventListener('input', updateGoalFutureValue);
 });
 
+/* ---------------- SIP calculator (required SIP for the goal above) ---------------- */
+function calcRequiredSip(){
+  updateGoalFutureValue(); // make sure goalFutureValue/goalYears reflect current slider positions
+  const target = goalFutureValue;
+  const months = goalYears * 12;
+  const annualRate = parseFloat(document.getElementById('assumedReturn').value)/100;
+  const status = document.getElementById('sipCalcStatus');
+
+  if(!target || !months || isNaN(annualRate)){
+    status.className = 'status-line err';
+    status.textContent = 'Set your goal above first — cost, inflation and years all feed this calculation.';
+    return;
+  }
+
+  const i = annualRate/12;
+  const factor = i===0 ? months : (((Math.pow(1+i, months)-1)/i) * (1+i));
+  const required = target / factor;
+
+  document.getElementById('calculatedSip').value = fmtINR(required) + ' / month';
+  document.getElementById('monthlySip').value = Math.round(required);
+  status.className = 'status-line ok';
+  status.textContent = `At ${annualRate*100}% assumed return over ${goalYears} years, this SIP reaches ${fmtINR(target)}. Edit the field above if you want to invest a different amount.`;
+  renderAllocation();
+}
+document.getElementById('calcSipBtn').addEventListener('click', calcRequiredSip);
+
 /* ---------------- history rendering ---------------- */
 async function renderHistory(){
   const snapshots = await loadSnapshots();
@@ -556,6 +608,7 @@ async function revalidateGoal(){
     goalCurrentValue: document.getElementById('goalCurrentValue').value,
     inflation: document.getElementById('inflationSlider').value,
     years: document.getElementById('yearsSlider').value,
+    assumedReturn: document.getElementById('assumedReturn').value,
   });
 }
 
@@ -600,6 +653,7 @@ if('serviceWorker' in navigator){
     if(state.goalCurrentValue) document.getElementById('goalCurrentValue').value = state.goalCurrentValue;
     if(state.inflation) document.getElementById('inflationSlider').value = state.inflation;
     if(state.years) document.getElementById('yearsSlider').value = state.years;
+    if(state.assumedReturn) document.getElementById('assumedReturn').value = state.assumedReturn;
   }
   await renderHistory();
   updateGoalFutureValue();
