@@ -167,11 +167,50 @@
 
 <section>
   <div class="card">
-    <div class="section-title">4 · Goal revalidation — ₹1 Cr in 5 years</div>
-    <div class="section-sub">Enter how far along you are. This recomputes the return you now need for the <em>remaining</em> months — not the original plan.</div>
+    <div class="section-title">4 · Your goal</div>
+    <div class="section-sub">What are you actually saving for? Set the goal, its cost today, and how inflation and time change what you'll really need.</div>
+
+    <div class="mgrid" style="margin-bottom:14px;">
+      <div class="field">
+        <label for="goalType">Goal type<span class="info-dot" title="Choosing a type just sets a sensible default inflation rate for that category — you can still override it below.">i</span></label>
+        <select id="goalType" title="Type of goal — sets a suggested inflation default.">
+          <option value="car" data-inflation="6">🚗 Car</option>
+          <option value="house" data-inflation="7">🏠 House / property</option>
+          <option value="wedding" data-inflation="7">💍 Wedding</option>
+          <option value="education" data-inflation="10">🎓 Education</option>
+          <option value="retirement" data-inflation="6">🏖️ Retirement corpus</option>
+          <option value="custom" data-inflation="6">✏️ Custom / other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="goalName">Goal name (optional)<span class="info-dot" title="A label for your own reference — e.g. 'Hyundai Creta' or '2BHK in Thane'. Doesn't affect the maths.">i</span></label>
+        <input type="text" id="goalName" placeholder="e.g. 2BHK in Thane" title="A label for your own reference — doesn't affect the calculation.">
+      </div>
+      <div class="field">
+        <label for="goalCurrentValue">Cost of goal, today (₹)<span class="info-dot" title="What this goal costs if you bought/paid for it today, at today's prices — before any inflation adjustment.">i</span></label>
+        <input type="number" id="goalCurrentValue" value="1500000" step="10000" title="What the goal costs today, before inflation.">
+      </div>
+    </div>
+
+    <div class="mgrid" style="margin-bottom:8px;">
+      <div class="field">
+        <label for="inflationSlider">Inflation assumption<span class="info-dot" title="Expected annual price rise for this category until you need the money. General CPI in India has averaged 5-6%; real estate and education typically run higher.">i</span> — <span id="inflationVal" style="color:var(--ink);font-weight:600;">6.0%</span></label>
+        <input type="range" id="inflationSlider" min="0" max="12" step="0.5" value="6" title="Expected annual inflation for this goal category.">
+      </div>
+      <div class="field">
+        <label for="yearsSlider">Years to goal<span class="info-dot" title="How many years from now you'll need the full amount. This also becomes the investment horizon used in the return calculations below.">i</span> — <span id="yearsVal" style="color:var(--ink);font-weight:600;">5 yrs</span></label>
+        <input type="range" id="yearsSlider" min="1" max="30" step="1" value="5" title="Years from now until you need the money.">
+      </div>
+    </div>
+
+    <div class="card" style="background:var(--paper-2);margin-top:10px;padding:16px;">
+      <div class="stat-row"><span class="k">Cost today</span><span class="v" id="goalTodayVal">—</span></div>
+      <div class="stat-row"><span class="k">Inflation-adjusted target, in <span id="goalYearsEcho">5</span> years</span><span class="v" id="goalFutureVal" style="font-size:16px;">—</span></div>
+    </div>
+
+    <div class="section-title" style="margin-top:22px;">5 · Goal revalidation</div>
+    <div class="section-sub">Enter how far along you are. This recomputes the return you now need for the <em>remaining</em> months against the inflation-adjusted target above — not the original plan.</div>
     <div class="grid2">
-      <div class="field"><label for="targetCorpus">Target corpus (₹)<span class="info-dot" title="The final corpus you're aiming for at the end of the horizon — e.g. ₹1,00,00,000 for a ₹1 Cr goal.">i</span></label><input type="number" id="targetCorpus" value="10000000" step="100000" title="Final corpus you're aiming for at the end of the horizon."></div>
-      <div class="field"><label for="targetMonths">Target horizon (months)<span class="info-dot" title="Total number of months you're investing for — e.g. 60 for a 5-year plan.">i</span></label><input type="number" id="targetMonths" value="60" title="Total months you're investing for (e.g. 60 = 5 years)."></div>
       <div class="field"><label for="monthsElapsed">Months elapsed so far<span class="info-dot" title="How many months into the plan you already are. Used to compare your actual corpus against where the original plan expected you to be by now.">i</span></label><input type="number" id="monthsElapsed" value="0" title="How many months into the plan you already are."></div>
       <div class="field"><label for="corpusSoFar">Corpus achieved so far (₹, optional)<span class="info-dot" title="Your actual current corpus value, if you've already started investing. Leave blank if you're just starting out — the tool will only show the baseline required return.">i</span></label><input type="number" id="corpusSoFar" placeholder="leave blank if just starting" title="Your actual current corpus value, if already investing. Leave blank if just starting."></div>
     </div>
@@ -182,7 +221,7 @@
 
 <section>
   <div class="card">
-    <div class="section-title">5 · Snapshot history</div>
+    <div class="section-title">6 · Snapshot history</div>
     <div class="section-sub">Every fetch or manual save is stored on this device, so the trend builds up the more you use this.</div>
     <div id="historyWrap"><div class="hist-empty">No snapshots saved yet.</div></div>
     <svg id="trendSvg" viewBox="0 0 900 120" preserveAspectRatio="none"></svg>
@@ -378,6 +417,43 @@ async function addSnapshot(sensex, high52w, pe, zone){
   await saveSnapshots(snapshots);
 }
 
+/* ---------------- goal builder (type, cost today, inflation & years sliders) ---------------- */
+const GOAL_DEFAULT_NAMES = {
+  car: 'New car', house: 'New house', wedding: 'Wedding', education: 'Education fund',
+  retirement: 'Retirement corpus', custom: 'Goal'
+};
+let goalFutureValue = 0, goalYears = 5;
+
+function updateGoalFutureValue(){
+  const currentVal = parseFloat(document.getElementById('goalCurrentValue').value) || 0;
+  const inflation = parseFloat(document.getElementById('inflationSlider').value) / 100;
+  const years = parseInt(document.getElementById('yearsSlider').value) || 1;
+
+  document.getElementById('inflationVal').textContent = (inflation*100).toFixed(1) + '%';
+  document.getElementById('yearsVal').textContent = years + (years===1?' yr':' yrs');
+  document.getElementById('goalYearsEcho').textContent = years;
+
+  const future = currentVal * Math.pow(1+inflation, years);
+  goalFutureValue = future;
+  goalYears = years;
+
+  document.getElementById('goalTodayVal').textContent = fmtINR(currentVal);
+  document.getElementById('goalFutureVal').textContent = fmtINR(future);
+}
+
+document.getElementById('goalType').addEventListener('change', (e) => {
+  const opt = e.target.selectedOptions[0];
+  document.getElementById('inflationSlider').value = opt.dataset.inflation;
+  const nameField = document.getElementById('goalName');
+  if(!nameField.value.trim() || Object.values(GOAL_DEFAULT_NAMES).includes(nameField.value)){
+    nameField.value = GOAL_DEFAULT_NAMES[opt.value] || '';
+  }
+  updateGoalFutureValue();
+});
+['goalCurrentValue','inflationSlider','yearsSlider'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updateGoalFutureValue);
+});
+
 /* ---------------- history rendering ---------------- */
 async function renderHistory(){
   const snapshots = await loadSnapshots();
@@ -427,19 +503,25 @@ function fvCombined(corpusSoFar, monthlySip, months, annualRate){
 }
 
 async function revalidateGoal(){
-  const target = parseFloat(document.getElementById('targetCorpus').value)||10000000;
-  const targetMonths = parseInt(document.getElementById('targetMonths').value)||60;
+  updateGoalFutureValue();
+  const target = goalFutureValue;
+  const targetMonths = goalYears * 12;
   const monthsElapsed = Math.max(0, parseInt(document.getElementById('monthsElapsed').value)||0);
   const corpusSoFarRaw = document.getElementById('corpusSoFar').value;
   const monthlySip = parseFloat(document.getElementById('monthlySip').value)||100000;
   const remainingMonths = Math.max(1, targetMonths - monthsElapsed);
+
 
   const out = document.getElementById('goalOutput');
 
   // baseline required XIRR from scratch (original plan)
   const baselineRate = solveRate(r => fvCombined(0, monthlySip, targetMonths, r) - target, 0.001, 0.6, 60);
 
-  let html = `<div class="stat-row"><span class="k">Required XIRR — original full-horizon plan</span><span class="v">${(baselineRate*100).toFixed(2)}%</span></div>`;
+  const goalLabel = document.getElementById('goalName').value.trim() || GOAL_DEFAULT_NAMES[document.getElementById('goalType').value] || 'your goal';
+  let html = `
+    <div class="stat-row"><span class="k">Goal</span><span class="v">${goalLabel}</span></div>
+    <div class="stat-row"><span class="k">Inflation-adjusted target (in ${goalYears} yrs)</span><span class="v">${fmtINR(target)}</span></div>
+    <div class="stat-row"><span class="k">Required XIRR — original full-horizon plan</span><span class="v">${(baselineRate*100).toFixed(2)}%</span></div>`;
 
   if(corpusSoFarRaw !== '' && monthsElapsed > 0){
     const corpusSoFar = parseFloat(corpusSoFarRaw)||0;
@@ -467,7 +549,14 @@ async function revalidateGoal(){
     html += `<div class="section-sub" style="margin-top:10px;">Enter months elapsed and corpus achieved so far to see whether you're ahead of, on, or behind the required trajectory.</div>`;
   }
   out.innerHTML = html;
-  await saveState({monthlySip, targetCorpus: target, targetMonths, monthsElapsed, corpusSoFar: corpusSoFarRaw, cadence});
+  await saveState({
+    monthlySip, monthsElapsed, corpusSoFar: corpusSoFarRaw, cadence,
+    goalType: document.getElementById('goalType').value,
+    goalName: document.getElementById('goalName').value,
+    goalCurrentValue: document.getElementById('goalCurrentValue').value,
+    inflation: document.getElementById('inflationSlider').value,
+    years: document.getElementById('yearsSlider').value,
+  });
 }
 
 /* ---------------- wiring ---------------- */
@@ -504,12 +593,16 @@ if('serviceWorker' in navigator){
   const state = await loadState();
   if(state){
     if(state.monthlySip) document.getElementById('monthlySip').value = state.monthlySip;
-    if(state.targetCorpus) document.getElementById('targetCorpus').value = state.targetCorpus;
-    if(state.targetMonths) document.getElementById('targetMonths').value = state.targetMonths;
     if(state.monthsElapsed) document.getElementById('monthsElapsed').value = state.monthsElapsed;
     if(state.corpusSoFar) document.getElementById('corpusSoFar').value = state.corpusSoFar;
+    if(state.goalType) document.getElementById('goalType').value = state.goalType;
+    if(state.goalName) document.getElementById('goalName').value = state.goalName;
+    if(state.goalCurrentValue) document.getElementById('goalCurrentValue').value = state.goalCurrentValue;
+    if(state.inflation) document.getElementById('inflationSlider').value = state.inflation;
+    if(state.years) document.getElementById('yearsSlider').value = state.years;
   }
   await renderHistory();
+  updateGoalFutureValue();
   const snapshots = await loadSnapshots();
   if(snapshots.length){
     const last = snapshots[snapshots.length-1];
