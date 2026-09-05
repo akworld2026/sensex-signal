@@ -1,0 +1,29 @@
+{
+  "asOf": "2026-09-06 (seed value — first Action run will refresh this)",
+  "sleeves": {
+    "small": [
+      {"name": "Bandhan Small Cap Fund Direct Growth", "schemeCode": null, "return1y": null, "return3y": 27.93, "return5y": 26.0},
+      {"name": "Invesco India Smallcap Fund Direct Growth", "schemeCode": null, "return1y": null, "return3y": null, "return5y": 29.73},
+      {"name": "Nippon India Small Cap Fund Direct Growth", "schemeCode": null, "return1y": null, "return3y": 17.33, "return5y": 20.92}
+    ],
+    "mid": [
+      {"name": "HDFC Mid Cap Opportunities Fund Direct Growth", "schemeCode": null, "return1y": null, "return3y": null, "return5y": 21.21},
+      {"name": "Motilal Oswal Midcap Fund Direct Growth", "schemeCode": null, "return1y": null, "return3y": 19.15, "return5y": 22.38},
+      {"name": "Edelweiss Mid Cap Fund Direct Growth", "schemeCode": null, "return1y": null, "return3y": 22.04, "return5y": 19.4}
+    ],
+    "flexi": [
+      {"name": "Bank of India Flexi Cap Fund Direct Growth", "schemeCode": null, "return1y": null, "return3y": 21.89, "return5y": 17.48},
+      {"name": "Quant Flexi Cap Fund Direct Growth", "schemeCode": null, "return1y": null, "return3y": null, "return5y": null},
+      {"name": "HDFC Flexi Cap Fund Direct Growth", "schemeCode": null, "return1y": null, "return3y": null, "return5y": null}
+    ],
+    "thematic": [
+      {"name": "ICICI Prudential Infrastructure Fund Direct Growth", "schemeCode": null, "return1y": null, "return3y": 18.65, "return5y": 22.64},
+      {"name": "Aditya Birla Sun Life Manufacturing Equity Fund Direct Growth", "schemeCode": null, "return1y": 26.54, "return3y": 22.36, "return5y": null}
+    ],
+    "liquid": [
+      {"name": "SBI Liquid Fund Direct Growth", "schemeCode": null, "return1y": 6.53, "return3y": null, "return5y": null},
+      {"name": "Axis Liquid Fund Direct Growth", "schemeCode": null, "return1y": 6.66, "return3y": null, "return5y": null},
+      {"name": "HDFC Liquid Fund Direct Growth", "schemeCode": null, "return1y": null, "return3y": null, "return5y": null}
+    ]
+  }
+}

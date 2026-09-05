@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sensex-signal-v2';
+const CACHE_NAME = 'sensex-signal-v3';
 const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (event) => {
@@ -19,8 +19,8 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   const url = event.request.url;
-  // data.json changes daily via the GitHub Action — always go to network, never serve a cached copy
-  if (url.includes('data.json')) {
+  // data.json and funds.json change via GitHub Actions — always go to network, never serve a cached copy
+  if (url.includes('data.json') || url.includes('funds.json')) {
     event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
     return;
   }
