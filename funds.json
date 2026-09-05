@@ -1,29 +1,137 @@
 {
-  "asOf": "2026-09-06 (seed value — first Action run will refresh this)",
+  "asOf": "2026-09-05 18:52 UTC",
   "sleeves": {
     "small": [
-      {"name": "Bandhan Small Cap Fund Direct Growth", "schemeCode": null, "return1y": null, "return3y": 27.93, "return5y": 26.0},
-      {"name": "Invesco India Smallcap Fund Direct Growth", "schemeCode": null, "return1y": null, "return3y": null, "return5y": 29.73},
-      {"name": "Nippon India Small Cap Fund Direct Growth", "schemeCode": null, "return1y": null, "return3y": 17.33, "return5y": 20.92}
+      {
+        "name": "BANDHAN Small Cap Fund - Direct Plan - Growth",
+        "schemeCode": 147946,
+        "nav": 57.721,
+        "navDate": "2026-09-04",
+        "return1y": 14.837952370531005,
+        "return3y": 25.32760844863786,
+        "return5y": 20.40422101007573
+      },
+      {
+        "name": "Invesco India Smallcap Fund Direct Growth",
+        "schemeCode": null,
+        "return1y": null,
+        "return3y": null,
+        "return5y": 29.73
+      },
+      {
+        "name": "Nippon India Small Cap Fund - Direct Plan - Growth Option",
+        "schemeCode": 118778,
+        "nav": 210.4787,
+        "navDate": "2026-09-04",
+        "return1y": 11.708916016646054,
+        "return3y": 15.310052969860411,
+        "return5y": 19.82495902710888
+      }
     ],
     "mid": [
-      {"name": "HDFC Mid Cap Opportunities Fund Direct Growth", "schemeCode": null, "return1y": null, "return3y": null, "return5y": 21.21},
-      {"name": "Motilal Oswal Midcap Fund Direct Growth", "schemeCode": null, "return1y": null, "return3y": 19.15, "return5y": 22.38},
-      {"name": "Edelweiss Mid Cap Fund Direct Growth", "schemeCode": null, "return1y": null, "return3y": 22.04, "return5y": 19.4}
+      {
+        "name": "HDFC Mid Cap Opportunities Fund Direct Growth",
+        "schemeCode": null,
+        "return1y": null,
+        "return3y": null,
+        "return5y": 21.21
+      },
+      {
+        "name": "Motilal Oswal Nifty Midcap 150 Index Fund - Direct Plan - Growth",
+        "schemeCode": 147622,
+        "nav": 42.0602,
+        "navDate": "2026-09-04",
+        "return1y": 9.946935041171079,
+        "return3y": 15.794227144626216,
+        "return5y": 16.77543171720184
+      },
+      {
+        "name": "Edelweiss Large & Mid Cap Fund - Direct Plan - Growth",
+        "schemeCode": 140175,
+        "nav": 108.91,
+        "navDate": "2026-09-04",
+        "return1y": 7.987784321891045,
+        "return3y": 14.947103092794144,
+        "return5y": 13.86202072834324
+      }
     ],
     "flexi": [
-      {"name": "Bank of India Flexi Cap Fund Direct Growth", "schemeCode": null, "return1y": null, "return3y": 21.89, "return5y": 17.48},
-      {"name": "Quant Flexi Cap Fund Direct Growth", "schemeCode": null, "return1y": null, "return3y": null, "return5y": null},
-      {"name": "HDFC Flexi Cap Fund Direct Growth", "schemeCode": null, "return1y": null, "return3y": null, "return5y": null}
+      {
+        "name": "BANK OF INDIA FLEXI CAP FUND - Direct Plan - Growth",
+        "schemeCode": 148404,
+        "nav": 42.54,
+        "navDate": "2026-09-04",
+        "return1y": 15.347071583514094,
+        "return3y": 20.19243500562129,
+        "return5y": 17.148866597065915
+      },
+      {
+        "name": "Quant Flexi Cap Fund - Direct Plan - Growth Option",
+        "schemeCode": 120843,
+        "nav": 121.0752,
+        "navDate": "2026-09-04",
+        "return1y": 16.324954171454475,
+        "return3y": 15.661396835771546,
+        "return5y": 14.977039906374689
+      },
+      {
+        "name": "HDFC Flexi Cap Fund - Direct Plan - Growth Option",
+        "schemeCode": 118955,
+        "nav": 2271.324,
+        "navDate": "2026-09-04",
+        "return1y": 4.2319667937065875,
+        "return3y": 16.39876578120605,
+        "return5y": 17.87138573359941
+      }
     ],
     "thematic": [
-      {"name": "ICICI Prudential Infrastructure Fund Direct Growth", "schemeCode": null, "return1y": null, "return3y": 18.65, "return5y": 22.64},
-      {"name": "Aditya Birla Sun Life Manufacturing Equity Fund Direct Growth", "schemeCode": null, "return1y": 26.54, "return3y": 22.36, "return5y": null}
+      {
+        "name": "ICICI Prudential Infrastructure Fund - Direct Plan - Growth",
+        "schemeCode": 120621,
+        "nav": 223.82,
+        "navDate": "2026-09-04",
+        "return1y": 7.260267407868892,
+        "return3y": 18.522525679099466,
+        "return5y": 22.66885898647022
+      },
+      {
+        "name": "Aditya Birla Sun Life Manufacturing Equity Fund - Direct Plan - GROWTH",
+        "schemeCode": 133516,
+        "nav": 44.81,
+        "navDate": "2026-09-04",
+        "return1y": 26.760961810466767,
+        "return3y": 21.847412869574544,
+        "return5y": 15.864140752673306
+      }
     ],
     "liquid": [
-      {"name": "SBI Liquid Fund Direct Growth", "schemeCode": null, "return1y": 6.53, "return3y": null, "return5y": null},
-      {"name": "Axis Liquid Fund Direct Growth", "schemeCode": null, "return1y": 6.66, "return3y": null, "return5y": null},
-      {"name": "HDFC Liquid Fund Direct Growth", "schemeCode": null, "return1y": null, "return3y": null, "return5y": null}
+      {
+        "name": "SBI LIQUID FUND - Direct Plan - Growth",
+        "schemeCode": 119800,
+        "nav": 4437.2153,
+        "navDate": "2026-09-05",
+        "return1y": 6.503472475996763,
+        "return3y": 6.9298891546556,
+        "return5y": 6.306904633900645
+      },
+      {
+        "name": "Axis Liquid Fund - Direct Plan - Growth Option",
+        "schemeCode": 120389,
+        "nav": 3158.6705,
+        "navDate": "2026-09-04",
+        "return1y": 6.6140084561592705,
+        "return3y": 7.032006380731826,
+        "return5y": 6.38547524136126
+      },
+      {
+        "name": "HDFC Liquid Fund - Direct Plan - Growth Option",
+        "schemeCode": 119091,
+        "nav": 5573.0089,
+        "navDate": "2026-09-04",
+        "return1y": 6.515514773198583,
+        "return3y": 6.954720215376686,
+        "return5y": 6.312870578015439
+      }
     ]
   }
 }
