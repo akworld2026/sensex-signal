@@ -108,6 +108,27 @@
 </header>
 
 <section>
+  <div class="card" id="decisionCard" style="border:2px solid var(--growth-d);">
+    <div class="eyebrow" style="margin-bottom:6px;">This month's decision</div>
+    <div id="decisionHeadline" style="font-family:'Fraunces',serif;font-size:clamp(22px,5vw,28px);font-weight:600;line-height:1.2;">Set your goal below to see your monthly number.</div>
+    <div id="decisionSub" class="section-sub" style="margin-top:8px;margin-bottom:0;"></div>
+    <div id="decisionDelta" style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;margin-top:10px;"></div>
+
+    <div id="decisionLossFrame" style="margin-top:14px;padding:14px;background:var(--paper-2);border:1px dashed var(--danger);border-radius:3px;display:none;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--danger);margin-bottom:6px;">⚠ If you skip this month</div>
+      <div id="decisionLossText" style="font-size:13px;line-height:1.5;"></div>
+    </div>
+
+    <div class="btnrow">
+      <button class="btn" id="confirmDecisionBtn">✓ I'm investing this amount this month</button>
+      <button class="btn secondary" id="toggleDetailsBtn">Show full breakdown ▾</button>
+    </div>
+    <div class="status-line" id="decisionConfirmStatus"></div>
+  </div>
+</section>
+
+<div id="detailsWrap">
+<section>
   <div class="card">
     <div class="section-title">1 · Your goal</div>
     <div class="section-sub">What are you actually saving for? Set the goal, its cost today, and how inflation and time change what you'll really need.</div>
@@ -259,6 +280,7 @@
     <b>Read before acting:</b> this tool classifies the market's current position relative to its own recent history — it does not predict future returns. Zone shifts should change where fresh SIP money goes, never trigger selling existing units (that creates avoidable LTCG/STCG tax drag, as discussed earlier). The required XIRR shown above is only as reliable as the assumed return you set in the SIP calculator, and it gets steeper if early months underperform — which is exactly what the revalidation panel is for. Treat every output here as a planning input, not a guarantee — small/mid-cap-heavy portfolios carry real drawdown risk that no allocation formula removes.
   </div>
 </section>
+</div>
 
 <script>
 /* ---------------- storage helpers (localStorage — persists per-device) ---------------- */
@@ -378,7 +400,7 @@ function runAnalysis(sensex, high52w, pe){
 function renderAllocation(){
   const tbody = document.getElementById('allocBody');
   const monthlySip = parseFloat(document.getElementById('monthlySip').value) || 0;
-  if(!lastZoneResult){ tbody.innerHTML=''; return; }
+  if(!lastZoneResult){ tbody.innerHTML=''; renderDecisionCard(); return; }
   const delta = ZONE_DELTA[lastZoneResult.zone];
   let adjusted = {};
   SLEEVE_META.forEach(s => adjusted[s.key] = BASE_ALLOC[s.key] + (delta[s.key]||0));
@@ -399,7 +421,105 @@ function renderAllocation(){
   });
   rows += `<tr class="total"><td>Total</td><td>100%</td><td>${totalPct.toFixed(1)}%</td><td>${fmtINR(totalAmt)}</td></tr>`;
   tbody.innerHTML = rows;
+  renderDecisionCard();
 }
+
+/* ---------------- decision card (#10 decision-first home, #2 loss-framed) ---------------- */
+function loadDecisionHistory(){
+  try{ const v = localStorage.getItem('decision-history'); return v ? JSON.parse(v) : []; }catch(e){ return []; }
+}
+function saveDecisionHistory(list){
+  try{ localStorage.setItem('decision-history', JSON.stringify(list.slice(-24))); }catch(e){ console.error(e); }
+}
+
+function renderDecisionCard(){
+  const monthlySip = parseFloat(document.getElementById('monthlySip').value) || 0;
+  const zone = lastZoneResult ? lastZoneResult.zone : null;
+  const goalLabel = document.getElementById('goalName').value.trim() || GOAL_DEFAULT_NAMES[document.getElementById('goalType').value] || 'your goal';
+
+  const headline = document.getElementById('decisionHeadline');
+  const sub = document.getElementById('decisionSub');
+  const deltaEl = document.getElementById('decisionDelta');
+
+  if(monthlySip > 0){
+    headline.textContent = `Invest ${fmtINR(monthlySip)} this month`;
+  } else {
+    headline.textContent = 'Set your goal below to see your monthly number.';
+  }
+  sub.textContent = zone
+    ? `Toward ${goalLabel} — market is currently in the ${zone} zone.`
+    : `Toward ${goalLabel} — load market data below to factor in the current zone.`;
+
+  // delta vs last confirmed decision
+  const history = loadDecisionHistory();
+  const last = history.length ? history[history.length-1] : null;
+  if(last && monthlySip > 0){
+    const diff = monthlySip - last.monthlySip;
+    if(Math.abs(diff) < 1){
+      deltaEl.textContent = `Same as your last confirmed month (${fmtINR(last.monthlySip)}).`;
+    } else {
+      const reason = (zone && last.zone && zone !== last.zone)
+        ? `market moved from ${last.zone} to ${zone}`
+        : 'a manual adjustment';
+      deltaEl.textContent = `${diff>0?'▲ +':'▼ '}${fmtINR(Math.abs(diff))} vs your last confirmed month (${fmtINR(last.monthlySip)}), because ${reason}.`;
+      deltaEl.style.color = diff>0 ? 'var(--growth-d)' : 'var(--danger)';
+    }
+  } else {
+    deltaEl.textContent = '';
+  }
+
+  renderLossFrame(monthlySip);
+}
+
+function renderLossFrame(monthlySip){
+  const box = document.getElementById('decisionLossFrame');
+  const text = document.getElementById('decisionLossText');
+  const target = goalFutureValue;
+  const monthsElapsed = Math.max(0, parseInt(document.getElementById('monthsElapsed').value)||0);
+  const remainingMonths = Math.max(2, (goalYears*12) - monthsElapsed);
+  const corpusSoFar = parseFloat(document.getElementById('corpusSoFar').value) || 0;
+
+  if(!target || monthlySip <= 0){ box.style.display='none'; return; }
+
+  const requiredRate = solveRate(r => fvCombined(corpusSoFar, monthlySip, remainingMonths, r) - target, -0.5, 0.9, 80);
+  if(!isFinite(requiredRate)){ box.style.display='none'; return; }
+
+  const i = requiredRate/12;
+  const lostFV = monthlySip * Math.pow(1+i, remainingMonths); // this month's contribution, had it compounded to goal date
+  const k = remainingMonths - 1;
+  const annuityFactor = k>0 ? (((Math.pow(1+i,k)-1)/i) * (1+i)) : 1;
+  const extraMonthly = k>0 ? lostFV/annuityFactor : lostFV;
+
+  text.innerHTML = `Skipping this month leaves roughly <b>${fmtINR(lostFV)}</b> less at your goal date, other things equal. To fully make it up, every remaining month's SIP would need to rise by about <b>${fmtINR(extraMonthly)}</b>.`;
+  box.style.display = 'block';
+}
+
+/* ---------------- confirm decision + collapse toggle ---------------- */
+document.getElementById('confirmDecisionBtn').addEventListener('click', () => {
+  const monthlySip = parseFloat(document.getElementById('monthlySip').value) || 0;
+  const zone = lastZoneResult ? lastZoneResult.zone : 'Unknown';
+  if(monthlySip <= 0) return;
+  const history = loadDecisionHistory();
+  history.push({date: new Date().toISOString(), monthlySip, zone});
+  saveDecisionHistory(history);
+  const status = document.getElementById('decisionConfirmStatus');
+  status.className = 'status-line ok';
+  status.textContent = `Confirmed ${fmtINR(monthlySip)} for ${new Date().toLocaleDateString('en-IN',{month:'long', year:'numeric'})}.`;
+  renderDecisionCard();
+});
+
+function setDetailsCollapsed(collapsed){
+  const wrap = document.getElementById('detailsWrap');
+  const btn = document.getElementById('toggleDetailsBtn');
+  wrap.style.display = collapsed ? 'none' : 'block';
+  btn.textContent = collapsed ? 'Show full breakdown ▾' : 'Hide full breakdown ▴';
+  try{ localStorage.setItem('details-collapsed', collapsed ? '1' : '0'); }catch(e){}
+}
+document.getElementById('toggleDetailsBtn').addEventListener('click', () => {
+  const wrap = document.getElementById('detailsWrap');
+  const isCollapsed = wrap.style.display === 'none';
+  setDetailsCollapsed(!isCollapsed);
+});
 
 /* ---------------- live fetch from GitHub Actions-generated data.json ---------------- */
 async function fetchLiveData(){
@@ -465,6 +585,7 @@ function updateGoalFutureValue(){
 
   document.getElementById('goalTodayVal').textContent = fmtINR(currentVal);
   document.getElementById('goalFutureVal').textContent = fmtINR(future);
+  renderDecisionCard();
 }
 
 document.getElementById('goalType').addEventListener('change', (e) => {
@@ -632,6 +753,8 @@ document.getElementById('monthlySip').addEventListener('input', renderAllocation
 document.getElementById('cadMonthly').addEventListener('click', ()=>{ cadence='monthly'; document.getElementById('cadMonthly').classList.add('active'); document.getElementById('cadQuarterly').classList.remove('active'); renderAllocation(); });
 document.getElementById('cadQuarterly').addEventListener('click', ()=>{ cadence='quarterly'; document.getElementById('cadQuarterly').classList.add('active'); document.getElementById('cadMonthly').classList.remove('active'); renderAllocation(); });
 document.getElementById('revalidateBtn').addEventListener('click', revalidateGoal);
+document.getElementById('monthsElapsed').addEventListener('input', renderDecisionCard);
+document.getElementById('corpusSoFar').addEventListener('input', renderDecisionCard);
 
 /* ---------------- PWA service worker registration ---------------- */
 if('serviceWorker' in navigator){
@@ -664,7 +787,12 @@ if('serviceWorker' in navigator){
     document.getElementById('high52w').value = last.high52w;
     document.getElementById('pe').value = last.pe;
     runAnalysis(last.sensex, last.high52w, last.pe);
+  } else {
+    renderDecisionCard();
   }
+  let collapsedPref = '0';
+  try{ collapsedPref = localStorage.getItem('details-collapsed') || '0'; }catch(e){}
+  setDetailsCollapsed(collapsedPref === '1');
 })();
 </script>
 </body>
