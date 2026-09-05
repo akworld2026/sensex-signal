@@ -1,0 +1,36 @@
+name: Update Market Data
+
+on:
+  schedule:
+    # 10:30 UTC = 4:00 PM IST, weekdays only (after NSE/BSE market close at 3:30 PM IST)
+    - cron: '30 10 * * 1-5'
+  workflow_dispatch: {}   # lets you trigger it manually from the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Fetch market data
+        run: python scripts/fetch_market_data.py
+
+      - name: Commit and push if data.json changed
+        run: |
+          git config user.name "market-data-bot"
+          git config user.email "actions@github.com"
+          git add data.json
+          git diff --cached --quiet || git commit -m "Update market data $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push
