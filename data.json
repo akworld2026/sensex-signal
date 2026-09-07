@@ -1,8 +1,8 @@
 {
-  "sensex": 77265,
-  "high52w": 86159,
-  "pe": 20.44,
-  "asOf": "2026-08-28 (seed value — first Action run will refresh this)",
+  "sensex": 76132.81,
+  "high52w": 86159.02,
+  "pe": 20.1,
+  "asOf": "2026-09-07 15:59 UTC",
   "sensexFetchOk": true,
   "peFetchOk": true
 }
