@@ -1,5 +1,5 @@
 {
-  "asOf": "2026-09-05 18:53 UTC",
+  "asOf": "2026-09-07 07:34 UTC",
   "sleeves": {
     "small": [
       {
@@ -108,29 +108,29 @@
       {
         "name": "SBI LIQUID FUND - Direct Plan - Growth",
         "schemeCode": 119800,
-        "nav": 4437.2153,
-        "navDate": "2026-09-05",
-        "return1y": 6.503472475996763,
-        "return3y": 6.9298891546556,
-        "return5y": 6.306904633900645
+        "nav": 4437.8541,
+        "navDate": "2026-09-06",
+        "return1y": 6.485790518143575,
+        "return3y": 6.9286320297600845,
+        "return5y": 6.308138599624535
       },
       {
         "name": "Axis Liquid Fund - Direct Plan - Growth Option",
         "schemeCode": 120389,
-        "nav": 3158.6705,
-        "navDate": "2026-09-04",
-        "return1y": 6.6140084561592705,
-        "return3y": 7.032006380731826,
-        "return5y": 6.38547524136126
+        "nav": 3159.6,
+        "navDate": "2026-09-06",
+        "return1y": 6.595536401316338,
+        "return3y": 7.029488992287902,
+        "return5y": 6.389913554828386
       },
       {
         "name": "HDFC Liquid Fund - Direct Plan - Growth Option",
         "schemeCode": 119091,
-        "nav": 5573.0089,
-        "navDate": "2026-09-04",
-        "return1y": 6.515514773198583,
-        "return3y": 6.954720215376686,
-        "return5y": 6.312870578015439
+        "nav": 5574.6258,
+        "navDate": "2026-09-06",
+        "return1y": 6.497524382453901,
+        "return3y": 6.952123736448046,
+        "return5y": 6.317170844105591
       }
     ]
   }
