@@ -1,15 +1,15 @@
 {
-  "asOf": "2026-10-05 09:39 UTC",
+  "asOf": "2026-10-12 09:50 UTC",
   "sleeves": {
     "small": [
       {
         "name": "BANDHAN Small Cap Fund - Direct Plan - Growth",
         "schemeCode": 147946,
-        "nav": 56.085,
-        "navDate": "2026-10-01",
-        "return1y": 10.4948973560818,
-        "return3y": 22.96081553139535,
-        "return5y": 19.298316956866234
+        "nav": 55.834,
+        "navDate": "2026-10-09",
+        "return1y": 9.637513254526176,
+        "return3y": 22.563513944966363,
+        "return5y": 18.229109463643756
       },
       {
         "name": "Invesco India Smallcap Fund Direct Growth",
@@ -21,11 +21,11 @@
       {
         "name": "Nippon India Small Cap Fund - Direct Plan - Growth Option",
         "schemeCode": 118778,
-        "nav": 202.2936,
-        "navDate": "2026-10-01",
-        "return1y": 7.896480105990444,
-        "return3y": 14.106179793384776,
-        "return5y": 18.066059658065114
+        "nav": 202.2962,
+        "navDate": "2026-10-09",
+        "return1y": 7.310058159643007,
+        "return3y": 14.178269778533581,
+        "return5y": 17.140814585842868
       }
     ],
     "mid": [
@@ -39,98 +39,98 @@
       {
         "name": "Motilal Oswal Nifty Midcap 150 Index Fund - Direct Plan - Growth",
         "schemeCode": 147622,
-        "nav": 39.292,
-        "navDate": "2026-10-01",
-        "return1y": 2.448042009641993,
-        "return3y": 12.999484034169129,
-        "return5y": 14.257061684877703
+        "nav": 39.2222,
+        "navDate": "2026-10-09",
+        "return1y": 0.21641648035770622,
+        "return3y": 13.267941189700494,
+        "return5y": 13.436278892753428
       },
       {
         "name": "Edelweiss Large & Mid Cap Fund - Direct Plan - Growth",
         "schemeCode": 140175,
-        "nav": 101.954,
-        "navDate": "2026-10-01",
-        "return1y": 1.1187590502449662,
-        "return3y": 12.592087982976818,
-        "return5y": 12.011789138814066
+        "nav": 102.086,
+        "navDate": "2026-10-09",
+        "return1y": -0.4514914821207472,
+        "return3y": 12.773961379214139,
+        "return5y": 11.46796705294233
       }
     ],
     "flexi": [
       {
         "name": "BANK OF INDIA FLEXI CAP FUND - Direct Plan - Growth",
         "schemeCode": 148404,
-        "nav": 41.36,
-        "navDate": "2026-10-01",
-        "return1y": 9.27344782034345,
-        "return3y": 17.92661047800077,
-        "return5y": 16.227576892271767
+        "nav": 41.4,
+        "navDate": "2026-10-09",
+        "return1y": 8.23529411764705,
+        "return3y": 18.08961025616589,
+        "return5y": 15.50164643355949
       },
       {
         "name": "Quant Flexi Cap Fund - Direct Plan - Growth Option",
         "schemeCode": 120843,
-        "nav": 116.7671,
-        "navDate": "2026-10-01",
-        "return1y": 7.876660757030818,
-        "return3y": 14.229829896079082,
-        "return5y": 13.72261459925046
+        "nav": 114.7115,
+        "navDate": "2026-10-09",
+        "return1y": 6.16343272393427,
+        "return3y": 13.904014685775202,
+        "return5y": 12.62583988068453
       },
       {
         "name": "HDFC Flexi Cap Fund - Direct Plan - Growth Option",
         "schemeCode": 118955,
-        "nav": 2150.082,
-        "navDate": "2026-10-01",
-        "return1y": -2.7699557054901347,
-        "return3y": 14.354322205583658,
-        "return5y": 15.53765190920684
+        "nav": 2152.467,
+        "navDate": "2026-10-09",
+        "return1y": -3.518696816807765,
+        "return3y": 14.277227998798647,
+        "return5y": 15.20135005158847
       }
     ],
     "thematic": [
       {
         "name": "ICICI Prudential Infrastructure Fund - Direct Plan - Growth",
         "schemeCode": 120621,
-        "nav": 210.26,
-        "navDate": "2026-10-01",
-        "return1y": -0.5721851799309619,
-        "return3y": 16.067443398163906,
-        "return5y": 19.801819245006303
+        "nav": 206.91,
+        "navDate": "2026-10-09",
+        "return1y": -3.163757195675565,
+        "return3y": 15.484946878548156,
+        "return5y": 18.938473475996886
       },
       {
         "name": "Aditya Birla Sun Life Manufacturing Equity Fund - Direct Plan - GROWTH",
         "schemeCode": 133516,
-        "nav": 42.85,
-        "navDate": "2026-10-01",
-        "return1y": 20.4328274311411,
-        "return3y": 20.271336804792604,
-        "return5y": 14.736265562135053
+        "nav": 42.21,
+        "navDate": "2026-10-09",
+        "return1y": 16.990022172949004,
+        "return3y": 19.766878848335878,
+        "return5y": 13.888578148927166
       }
     ],
     "liquid": [
       {
         "name": "SBI LIQUID FUND - Direct Plan - Growth",
         "schemeCode": 119800,
-        "nav": 4456.4395,
-        "navDate": "2026-10-04",
-        "return1y": 6.467885849013411,
-        "return3y": 6.888971235459329,
-        "return5y": 6.3474049446422764
+        "nav": 4462.191,
+        "navDate": "2026-10-11",
+        "return1y": 6.480357720507279,
+        "return3y": 6.890594706797137,
+        "return5y": 6.359953425712961
       },
       {
         "name": "Axis Liquid Fund - Direct Plan - Growth Option",
         "schemeCode": 120389,
-        "nav": 3172.9339,
-        "navDate": "2026-10-04",
-        "return1y": 6.552404155072877,
-        "return3y": 6.989667245202313,
-        "return5y": 6.429709582134691
+        "nav": 3177.2804,
+        "navDate": "2026-10-11",
+        "return1y": 6.587352367991195,
+        "return3y": 6.993780042756281,
+        "return5y": 6.44449444513604
       },
       {
         "name": "HDFC Liquid Fund - Direct Plan - Growth Option",
         "schemeCode": 119091,
-        "nav": 5598.0849,
-        "navDate": "2026-10-04",
-        "return1y": 6.461304441565585,
-        "return3y": 6.912118053459859,
-        "return5y": 6.357469696466755
+        "nav": 5605.687,
+        "navDate": "2026-10-11",
+        "return1y": 6.4961470502482355,
+        "return3y": 6.916455714087544,
+        "return5y": 6.371663211424594
       }
     ]
   }
